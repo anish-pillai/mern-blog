@@ -8,7 +8,7 @@ dotenv.config();
 const mongoDB = process.env.MONGO_URI;
 
 mongoose
-  .connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(mongoDB)
   .then(() => console.log('Mongo DB is connected'))
   .catch((err) => console.log('Mondo DB connection failed! ', err));
 
@@ -22,3 +22,14 @@ app.listen(port, () => {
 });
 app.use('/api/user', userRouter);
 app.use('/api/auth', auth);
+
+// Add an error handling middleware
+app.use((err, req, res, next) => {
+  const statusCode = err.statusCode || 500;
+  const errorMessage = err.message || 'Internal Server Error';
+  res.status(statusCode).json({
+    success: false,
+    status: statusCode,
+    message: errorMessage,
+  });
+});
